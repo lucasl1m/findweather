@@ -8,11 +8,10 @@ import {
 
 import { StatusBar } from "expo-status-bar";
 import { Box, NativeBaseProvider, Text, useTheme } from "native-base";
-import { Button } from "./src/components/Button";
+import { Routes } from "./src/routes";
 import { theme } from "./src/theme";
 
 export default function App() {
-
     const [fontsLoaded] = useFonts({
         Overpass_300Light,
         Overpass_400Regular,
@@ -26,22 +25,13 @@ export default function App() {
 
     return (
         <NativeBaseProvider theme={theme}>
-            <Box
-                flex={1}
-                bg={theme.colors.dark[500]}
-                alignItems="center"
-                justifyContent="center"
-            >
-                <Text color={theme.colors.white}>
-                    Open up App.js to start working on your app!
-                </Text>
+            <Routes />
 
-                <StatusBar
-                    style="light"
-                    backgroundColor="transparent"
-                    translucent
-                />
-            </Box>
+            <StatusBar
+                style="light"
+                backgroundColor="transparent"
+                translucent
+            />
         </NativeBaseProvider>
     );
 }

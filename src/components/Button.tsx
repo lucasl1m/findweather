@@ -15,20 +15,19 @@ export function Button({ title, ...rest }: Props) {
     return (
         <ButtonNativeBase
             w="full"
+            alignItems="center"
+            justifyContent="center"
             rounded="xl"
             borderWidth={1}
             borderColor={theme.colors.gray[300]}
             bg={theme.colors.dark[300]}
-            _pressed={{
-                opacity: 0.75,
-            }}
             _loading={{
                 _spinner: { color: theme.colors.white },
             }}
             {...rest}
         >
             <Text
-                fontSize={theme.fontSizes.lg}
+                fontSize={theme.fontSizes.xl}
                 fontFamily="Overpass_400Regular"
                 color={theme.colors.white}
             >
