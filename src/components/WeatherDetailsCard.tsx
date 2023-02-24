@@ -1,6 +1,19 @@
 import { useTheme, HStack, Center, Image, Text, Divider } from "native-base";
+import React from "react";
+import { ImageSourcePropType } from "react-native";
 
-export function WeatherDetailsCard() {
+interface IWeatherDescriptionData {
+    id: number;
+    icon: ImageSourcePropType;
+    value: string;
+    text: string;
+}
+
+interface IWeatherData {
+    data: IWeatherDescriptionData[];
+}
+
+export function WeatherDetailsCard({ data }: IWeatherData) {
     const theme = useTheme();
 
     return (
@@ -11,63 +24,35 @@ export function WeatherDetailsCard() {
             mt={6}
             px={4}
             py={3}
-            borderColor={theme.colors.gray[600]}
+            borderColor={theme.colors.dark[100]}
             borderWidth={1}
-            rounded="3xl"
+            rounded="18px"
         >
-            <Center>
-                <Image
-                    source={require("../assets/drop-miniature.png")}
-                    alt="Imagem de uma gota de água"
-                    mb={2}
-                />
-                <Text
-                    color={theme.colors.white}
-                    fontSize="xl"
-                    fontWeight="bold"
-                >
-                    24%
-                </Text>
-                <Text color="gray.400" fontSize="sm">
-                    Umidade
-                </Text>
-            </Center>
-            <Divider orientation="vertical" bg="gray.600" h="1/2" />
-            <Center>
-                <Image
-                    source={require("../assets/wind-miniature.png")}
-                    alt="Imagem de vento"
-                    mb={2}
-                />
-                <Text
-                    color={theme.colors.white}
-                    fontSize="xl"
-                    fontWeight="bold"
-                >
-                    20km/h
-                </Text>
-                <Text color="gray.400" fontSize="sm">
-                    Vento
-                </Text>
-            </Center>
-            <Divider orientation="vertical" bg="gray.600" h="1/2" />
-            <Center>
-                <Image
-                    source={require("../assets/raining-cloud-miniature.png")}
-                    alt="Imagem de uma nuvem com chuva"
-                    mb={2}
-                />
-                <Text
-                    color={theme.colors.white}
-                    fontSize="xl"
-                    fontWeight="bold"
-                >
-                    76%
-                </Text>
-                <Text color="gray.400" fontSize="sm">
-                    Chuva
-                </Text>
-            </Center>
+            {data.map((item, index) => (
+                <React.Fragment key={item.id}>
+                    <Center>
+                        <Image source={item.icon} alt={item.text} mb={2} />
+                        <Text
+                            color={theme.colors.white}
+                            fontSize="xl"
+                            fontWeight="bold"
+                        >
+                            {item.value}
+                        </Text>
+                        <Text color="gray.400" fontSize="sm">
+                            {item.text}
+                        </Text>
+                    </Center>
+                    {index !== data.length - 1 && (
+                        <Divider
+                            orientation="vertical"
+                            borderColor={theme.colors.dark[100]}
+                            borderWidth={1}
+                            h={10}
+                        />
+                    )}
+                </React.Fragment>
+            ))}
         </HStack>
     );
 }

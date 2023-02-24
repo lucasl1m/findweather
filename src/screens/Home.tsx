@@ -4,213 +4,257 @@ import {
     VStack,
     Image,
     Heading,
-    Box,
     HStack,
     Link,
+    FlatList,
+    SectionList,
     Center,
-    ScrollView,
+    Box,
 } from "native-base";
 
-import { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { CaretRight } from "phosphor-react-native";
 
 import { EmptyCity } from "../components/EmptyCity";
-import { Header } from "../components/Header";
 import { WeatherDetailsCard } from "../components/WeatherDetailsCard";
+import { CardHourTemperature } from "../components/CardHourTemperature";
 
-export function Home() {
-    const [city, setCity] = useState("A Coruña, Espanha");
+import RainingPNG from "../assets/raining.png";
+import DropMiniaturePNG from "../assets/drop-miniature.png";
+import WindMiniaturePNG from "../assets/wind-miniature.png";
+import RainingCloudPNG from "../assets/raining-cloud-miniature.png";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { MapPin } from "phosphor-react-native";
+import {
+    ICurrent,
+    IForecastData,
+    ILocation,
+    ISearchData,
+} from "../utils/search.interface";
+import { CITY_NAME } from "../storage/storage.config";
+import { FindWeatherAPI } from "../services/FindWeatherAPI";
+import { useFocusEffect } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native";
+import { formatDate } from "../utils/formatDate";
+
+interface IFullContentData {
+    location: ILocation;
+    current: ICurrent;
+    forecast: {
+        forecastday: Array<IForecastData>;
+    };
+    date: string;
+}
+
+function FullContent({ location, current, forecast, date }: IFullContentData) {
+    const { humidity, wind_kph } = current;
+    const { daily_chance_of_rain } = forecast.forecastday[0].day;
+
+    const dataWeatherDescription = [
+        {
+            id: 1,
+            icon: DropMiniaturePNG,
+            value: `${humidity}%`,
+            text: "Umidade",
+        },
+
+        {
+            id: 2,
+            icon: WindMiniaturePNG,
+            value: `${Math.floor(wind_kph)}km/h`,
+            text: "Veloc. Vento",
+        },
+
+        {
+            id: 3,
+            icon: RainingCloudPNG,
+            value: `${Math.floor(daily_chance_of_rain)}%`,
+            text: "Chuva",
+        },
+    ];
 
     const theme = useTheme();
 
     return (
         <VStack flex={1} bg={theme.colors.dark[500]}>
-            {city ? (
-                <>
-                    <Header
-                        title="A Coruña, Espanha"
-                        subtitle="Domingo, 01 Jan de 2023"
-                    />
+            <VStack alignItems="center">
+                <HStack alignItems="center">
+                    <MapPin size={20} color={theme.colors.white} />
+                    <Text
+                        fontSize={theme.fontSizes.xl}
+                        color={theme.colors.white}
+                    >
+                        {""} {location.name}, {""}
+                    </Text>
 
-                    <ScrollView flex={1}>
-                        <Image
-                            source={require("../assets/heavy-raining-middle.png")}
-                            alt="Logo"
-                            mt={12}
-                            size={200}
-                            alignSelf="center"
-                        />
-                        <Heading
-                            color="white"
-                            fontSize="6xl"
-                            textAlign="center"
-                            mt={2}
-                        >
-                            20º
-                        </Heading>
-                        <Text
-                            color={theme.colors.gray[100]}
-                            fontSize="3xl"
-                            textAlign="center"
-                            mt={2}
-                        >
-                            Chuva Moderada
-                        </Text>
+                    <Text
+                        fontSize={theme.fontSizes.xl}
+                        color={theme.colors.white}
+                    >
+                        {location.country}
+                    </Text>
+                </HStack>
+                <Text
+                    fontSize={theme.fontSizes.lg}
+                    color={theme.colors.gray[100]}
+                >
+                    {date}
+                </Text>
+            </VStack>
+            <Image
+                source={RainingPNG}
+                alt="Imagem referente ao clima"
+                size={200}
+                mt={12}
+                alignSelf="center"
+            />
+            <Heading color="white" fontSize="6xl" textAlign="center" mt={2}>
+                {Math.floor(current.temp_c)}°
+            </Heading>
+            <Text
+                color={theme.colors.gray[100]}
+                fontSize="3xl"
+                textAlign="center"
+                mt={2}
+            >
+                {current.condition.text}
+            </Text>
 
-                        <WeatherDetailsCard />
+            <WeatherDetailsCard data={dataWeatherDescription} />
 
-                        <VStack w="full" mt={6}>
-                            <HStack
-                                alignItems="center"
-                                justifyContent="space-between"
-                            >
-                                <Text color={theme.colors.white} fontSize="2xl">
-                                    Hoje
-                                </Text>
-                                <Link
-                                    onPress={() => {}}
-                                    alignItems="center"
-                                    _text={{
-                                        color: theme.colors.gray[100],
-                                        fontSize: "lg",
-                                    }}
-                                >
-                                    Próximos 5 dias
-                                    <CaretRight
-                                        size={20}
-                                        color={theme.colors.gray[100]}
-                                    />
-                                </Link>
-                            </HStack>
-                            <HStack mt={4} justifyContent="space-between">
-                                <Center
-                                    display="flex"
-                                    bg={theme.colors.dark[300]}
-                                    px={4}
-                                    py={2}
-                                    rounded="2xl"
-                                    borderWidth={1}
-                                    borderColor={theme.colors.dark[100]}
-                                >
-                                    <Text
-                                        color={theme.colors.white}
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                    >
-                                        24°
-                                    </Text>
-                                    <Image
-                                        source={require("../assets/raining-middle.png")}
-                                        alt=""
-                                        size={8}
-                                        my={2}
-                                    />
-                                    <Text
-                                        color={theme.colors.gray[100]}
-                                        fontSize="xs"
-                                        fontWeight="bold"
-                                    >
-                                        09:00
-                                    </Text>
-                                </Center>
-                                <Center
-                                    display="flex"
-                                    bg={theme.colors.dark[300]}
-                                    px={4}
-                                    py={2}
-                                    rounded="2xl"
-                                    borderWidth={1}
-                                    borderColor={theme.colors.dark[100]}
-                                >
-                                    <Text
-                                        color={theme.colors.white}
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                    >
-                                        24°
-                                    </Text>
-                                    <Image
-                                        source={require("../assets/raining-middle.png")}
-                                        alt=""
-                                        size={8}
-                                        my={2}
-                                    />
-                                    <Text
-                                        color={theme.colors.gray[100]}
-                                        fontSize="xs"
-                                        fontWeight="bold"
-                                    >
-                                        09:00
-                                    </Text>
-                                </Center>
-                                <Center
-                                    display="flex"
-                                    bg={theme.colors.dark[300]}
-                                    px={4}
-                                    py={2}
-                                    rounded="2xl"
-                                    borderWidth={1}
-                                    borderColor={theme.colors.dark[100]}
-                                >
-                                    <Text
-                                        color={theme.colors.white}
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                    >
-                                        24°
-                                    </Text>
-                                    <Image
-                                        source={require("../assets/raining-middle.png")}
-                                        alt=""
-                                        size={8}
-                                        my={2}
-                                    />
-                                    <Text
-                                        color={theme.colors.gray[100]}
-                                        fontSize="xs"
-                                        fontWeight="bold"
-                                    >
-                                        09:00
-                                    </Text>
-                                </Center>
-                                <Center
-                                    display="flex"
-                                    bg={theme.colors.dark[300]}
-                                    px={4}
-                                    py={2}
-                                    rounded="2xl"
-                                    borderWidth={1}
-                                    borderColor={theme.colors.dark[100]}
-                                >
-                                    <Text
-                                        color={theme.colors.white}
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                    >
-                                        24°
-                                    </Text>
-                                    <Image
-                                        source={require("../assets/raining-middle.png")}
-                                        alt=""
-                                        size={8}
-                                        my={2}
-                                    />
-                                    <Text
-                                        color={theme.colors.gray[100]}
-                                        fontSize="xs"
-                                        fontWeight="bold"
-                                    >
-                                        09:00
-                                    </Text>
-                                </Center>
-                            </HStack>
-                        </VStack>
-                    </ScrollView>
-                </>
-            ) : (
-                <EmptyCity />
-            )}
+            <VStack w="full" mt={6}>
+                <HStack alignItems="center" justifyContent="space-between">
+                    <Text color={theme.colors.white} fontSize="2xl">
+                        Hoje
+                    </Text>
+                    <Link
+                        onPress={() => {}}
+                        alignItems="center"
+                        _text={{
+                            color: theme.colors.gray[100],
+                            fontSize: "lg",
+                        }}
+                    >
+                        Próximos 7 dias
+                        <CaretRight size={20} color={theme.colors.gray[100]} />
+                    </Link>
+                </HStack>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={forecast.forecastday[0].hour}
+                    ItemSeparatorComponent={() => (
+                        <Box w={theme.space[1]} />
+                    )}
+                    keyExtractor={(_, index) => String(index)}
+                    renderItem={({ item, index }) => {
+                        const dataCardHourTemperature = [
+                            {
+                                id: index,
+                                icon: item.condition.icon,
+                                temperatureValue: Math.floor(item.temp_c),
+                                hour: item.time.substring(11, 16),
+                            },
+                        ];
+                        return (
+                            <CardHourTemperature
+                                data={dataCardHourTemperature}
+                                key={index}
+                            />
+                        );
+                    }}
+                />
+            </VStack>
         </VStack>
+    );
+}
+
+export function Home() {
+    const theme = useTheme();
+    const [city, setCity] = useState(null);
+    const [response, setResponse] = useState<ISearchData>(null);
+    const [currentDate, setCurrentDate] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const getDate = () => {
+        setCurrentDate(formatDate());
+      };
+
+    const getCityName = useCallback(async () => {
+        const storedCity = await AsyncStorage.getItem(CITY_NAME);
+
+        setCity(storedCity);
+
+        setIsLoading(false);
+    }, []);
+
+    const getAPIData = async () => {
+        setIsLoading(true);
+
+        await AsyncStorage.removeItem(CITY_NAME);
+
+        await FindWeatherAPI.getForecast(city)
+            .then((response) => {
+                const data = response.data;
+
+                setResponse(data);
+                setIsLoading(false);
+            })
+            .catch((error) => console.log("Error calling API: ", error));
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            getCityName();
+            getDate();
+        }, [])
+    );
+
+    useEffect(() => {
+        if (city) {
+            getAPIData();
+        } else {
+            setIsLoading(false);
+            setResponse(null);
+        }
+    }, [city]);
+
+    if (isLoading) {
+        return (
+            <Center flex={1} bg={theme.colors.dark[500]}>
+                <ActivityIndicator size="small" color={theme.colors.white} />
+            </Center>
+        );
+    }
+
+    return (
+        <SectionList
+            style={{
+                backgroundColor: theme.colors.dark[500],
+                paddingHorizontal: 16,
+            }}
+            sections={[
+                {
+                    title: "",
+                    data: [
+                        response ? (
+                            <FullContent
+                                current={response.current}
+                                location={response.location}
+                                forecast={response.forecast}
+                                date={currentDate}
+                            />
+                        ) : (
+                            <EmptyCity />
+                        ),
+                    ],
+                },
+            ]}
+            renderItem={({ item }) => item}
+            keyExtractor={(_, index) => String(index)}
+        />
     );
 }

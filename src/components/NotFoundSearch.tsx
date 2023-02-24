@@ -2,11 +2,10 @@ import { Center, Image, Text } from "native-base";
 
 export function NotFoundSearch() {
     return (
-        <Center>
+        <Center mt={10}>
             <Image
                 source={require("../assets/not-found-destination.png")}
                 alt="Imagem de um mapa com uma seta apontando para um local não encontrado"
-                mt={12}
             />
             <Center mt={6}>
                 <Text
