@@ -63,4 +63,4 @@ i -> para abrir no emulador iOS
 Meu nome é Lucas Lima, e foi um prazer criar esse aplicativo e toda sua interface.
 Para saber mais detalhes sobre minha carreira acesse meu [LinkedIn](https://www.linkedin.com/in/lucasarl1m/) 👨‍💻.
 
-Made with love :heartpulse: by Lucas.
+Made by Lucas.
