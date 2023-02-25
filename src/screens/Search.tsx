@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTheme, VStack, Button, Box } from "native-base";
 
 import { Header } from "../components/Header";
@@ -8,15 +8,17 @@ import { CityCard, ICardResult } from "../components/CityCard";
 
 import { MagnifyingGlass } from "phosphor-react-native";
 
-import { FindWeatherAPI } from "../services/FindWeatherAPI";
+import { FindWeatherAPI } from "../services/findweather-api";
 import { ISearchData } from "../utils/search.interface";
 import { ActivityIndicator } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CITY_NAME } from "../storage/storage.config";
-import { useNavigation } from "@react-navigation/native";
+import { CITY_NAME, COUNTRY_CODE } from "../storage/storage.config";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 export function Search() {
+    const { API_KEY_OPENCAGEDATA } = process.env;
+
     const theme = useTheme();
     const navigator = useNavigation();
 
@@ -27,10 +29,23 @@ export function Search() {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSelectCity = async (city: string) => {
+    const handleSelectCity = async (city: string, country: string) => {
         await AsyncStorage.setItem(CITY_NAME, city);
 
-        setTextTyped("");
+        fetch(
+            `https://api.opencagedata.com/geocode/v1/json?key=${API_KEY_OPENCAGEDATA}&q=${country}`
+        )
+            .then((response) => response.json())
+            .then(
+                async (data) =>
+                    await AsyncStorage.setItem(
+                        COUNTRY_CODE,
+                        data.results[0].components.country_code
+                    )
+            )
+            .catch((error) =>
+                console.log("Error calling open cage data API: ", error)
+            );
 
         navigator.navigate("home");
     };
@@ -39,6 +54,8 @@ export function Search() {
         FindWeatherAPI.getForecast(textTyped)
             .then(async (res) => {
                 setIsLoading(true);
+                setTextTyped("");
+                setIsError(false);
                 setResponse(res.data);
 
                 const { location, current } = res.data;
@@ -67,6 +84,13 @@ export function Search() {
                 setIsLoading(false);
             });
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            setResponse(null);
+        }, [])
+    );
+
     return (
         <VStack flex={1} bg={theme.colors.dark[500]}>
             <Header title="Busca" showBackButton />
@@ -108,7 +132,7 @@ export function Search() {
             {response && !isError && !isLoading && (
                 <CityCard
                     data={dataCard}
-                    onPress={() => handleSelectCity(dataCard.location.name)}
+                    onPress={() => handleSelectCity(dataCard.location.name, dataCard.location.country)}
                 />
             )}
         </VStack>

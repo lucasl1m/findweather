@@ -34,11 +34,14 @@ import {
     ILocation,
     ISearchData,
 } from "../utils/search.interface";
-import { CITY_NAME } from "../storage/storage.config";
-import { FindWeatherAPI } from "../services/FindWeatherAPI";
-import { useFocusEffect } from "@react-navigation/native";
+import { CITY_NAME, COUNTRY_CODE } from "../storage/storage.config";
+import { FindWeatherAPI } from "../services/findweather-api";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
 import { formatDate } from "../utils/formatDate";
+import { IForecast5Days, IForecastDay } from "../utils/forecast5days.interface";
+import { FindWeatherOpenWeatherAPI } from "../services/findweather-api-openweather";
+import { forecastConditionsIcons } from "../utils/forecastIcon";
 
 interface IFullContentData {
     location: ILocation;
@@ -46,10 +49,17 @@ interface IFullContentData {
     forecast: {
         forecastday: Array<IForecastData>;
     };
+    forecast5Days: Array<IForecastDay>;
     date: string;
 }
 
-function FullContent({ location, current, forecast, date }: IFullContentData) {
+function FullContent({
+    location,
+    current,
+    forecast,
+    forecast5Days,
+    date,
+}: IFullContentData) {
     const { humidity, wind_kph } = current;
     const { daily_chance_of_rain } = forecast.forecastday[0].day;
 
@@ -77,6 +87,7 @@ function FullContent({ location, current, forecast, date }: IFullContentData) {
     ];
 
     const theme = useTheme();
+    const navigation = useNavigation();
 
     return (
         <VStack flex={1} bg={theme.colors.dark[500]}>
@@ -105,7 +116,7 @@ function FullContent({ location, current, forecast, date }: IFullContentData) {
                 </Text>
             </VStack>
             <Image
-                source={RainingPNG}
+                source={forecastConditionsIcons(current.condition.text)}
                 alt="Imagem referente ao clima"
                 size={200}
                 mt={12}
@@ -131,14 +142,19 @@ function FullContent({ location, current, forecast, date }: IFullContentData) {
                         Hoje
                     </Text>
                     <Link
-                        onPress={() => {}}
+                        onPress={() =>
+                            navigation.navigate("next5Days", {
+                                forecast: forecast,
+                                forecast5Days: forecast5Days,
+                            })
+                        }
                         alignItems="center"
                         _text={{
                             color: theme.colors.gray[100],
                             fontSize: "lg",
                         }}
                     >
-                        Próximos 7 dias
+                        Próximos 5 dias
                         <CaretRight size={20} color={theme.colors.gray[100]} />
                     </Link>
                 </HStack>
@@ -146,9 +162,7 @@ function FullContent({ location, current, forecast, date }: IFullContentData) {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     data={forecast.forecastday[0].hour}
-                    ItemSeparatorComponent={() => (
-                        <Box w={theme.space[1]} />
-                    )}
+                    ItemSeparatorComponent={() => <Box w={theme.space[1]} />}
                     keyExtractor={(_, index) => String(index)}
                     renderItem={({ item, index }) => {
                         const dataCardHourTemperature = [
@@ -174,17 +188,23 @@ function FullContent({ location, current, forecast, date }: IFullContentData) {
 
 export function Home() {
     const theme = useTheme();
+
     const [city, setCity] = useState(null);
+    const [countryCode, setCountryCode] = useState(null);
     const [response, setResponse] = useState<ISearchData>(null);
     const [currentDate, setCurrentDate] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [forecast5Days, setForecast5Days] = useState<IForecast5Days>(null);
 
     const getDate = () => {
         setCurrentDate(formatDate());
-      };
+    };
 
     const getCityName = useCallback(async () => {
         const storedCity = await AsyncStorage.getItem(CITY_NAME);
+        const storedCountryCode = await AsyncStorage.getItem(COUNTRY_CODE);
+
+        setCountryCode(storedCountryCode);
 
         setCity(storedCity);
 
@@ -193,8 +213,6 @@ export function Home() {
 
     const getAPIData = async () => {
         setIsLoading(true);
-
-        await AsyncStorage.removeItem(CITY_NAME);
 
         await FindWeatherAPI.getForecast(city)
             .then((response) => {
@@ -206,19 +224,35 @@ export function Home() {
             .catch((error) => console.log("Error calling API: ", error));
     };
 
+    const getForecast5Days = async () => {
+        setIsLoading(true);
+
+        await FindWeatherOpenWeatherAPI.getForecast(city, countryCode)
+            .then((res) => {
+                const data: IForecast5Days = res.data;
+
+                setForecast5Days(data);
+            })
+            .catch((error) =>
+                console.log("Error calling 5 next days forecast API: ", error)
+            );
+    };
+
     useFocusEffect(
         useCallback(() => {
             getCityName();
-            getDate();
         }, [])
     );
 
     useEffect(() => {
         if (city) {
             getAPIData();
+            getDate();
+            getForecast5Days();
         } else {
             setIsLoading(false);
             setResponse(null);
+            setForecast5Days(null);
         }
     }, [city]);
 
@@ -229,7 +263,6 @@ export function Home() {
             </Center>
         );
     }
-
     return (
         <SectionList
             style={{
@@ -245,6 +278,9 @@ export function Home() {
                                 current={response.current}
                                 location={response.location}
                                 forecast={response.forecast}
+                                forecast5Days={
+                                    forecast5Days && forecast5Days.list
+                                }
                                 date={currentDate}
                             />
                         ) : (

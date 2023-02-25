@@ -1,4 +1,5 @@
 import { Box, Text, Image, useTheme, Button, IButtonProps } from "native-base";
+import { forecastConditionsIcons } from "../utils/forecastIcon";
 
 export interface ICardResult {
     location: {
@@ -59,7 +60,7 @@ export function CityCard({ data, ...rest }: ICardResultData) {
                 </Box>
 
                 <Image
-                    source={{ uri: `https:${condition.icon}` }}
+                    source={forecastConditionsIcons(condition.text)}
                     alt="Ícone da condição atual da cidade"
                     size="45px"
                 />

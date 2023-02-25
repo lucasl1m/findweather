@@ -18,7 +18,7 @@ export function WeatherDetailsCard({ data }: IWeatherData) {
 
     return (
         <HStack
-            w="full"
+            w="100%"
             alignItems="center"
             justifyContent="space-around"
             mt={6}

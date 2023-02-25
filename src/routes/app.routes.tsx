@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Platform } from "react-native";
 
 import { MagnifyingGlass, House } from "phosphor-react-native";
+import { Next5Days } from "../screens/Next5Days";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -23,6 +24,7 @@ export function AppRoutes() {
         >
             <Stack.Screen name="welcome" component={Welcome} />
             <Stack.Screen name="main" component={MainTabs} />
+            <Stack.Screen name="next5Days" component={Next5Days} />
         </Stack.Navigator>
     );
 }

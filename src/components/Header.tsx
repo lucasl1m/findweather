@@ -14,7 +14,7 @@ export function Header({ title, showBackButton = false }: Props) {
     const navigator = useNavigation();
 
     return (
-        <HStack w="full" alignItems="center" justifyContent="space-between">
+        <HStack py={2} alignItems="center"  justifyContent="space-between">
             {showBackButton ? (
                 <ButtonIcon
                     icon={CaretLeft}
