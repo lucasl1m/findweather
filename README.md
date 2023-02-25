@@ -5,7 +5,7 @@
 - [:camera: Imagens finais](#camera-imagens-finais)
 - [:computer: Como rodar o projeto](#computer-como-rodar-o-projeto)
 - [:wrench: Tecnologias utilizadas](#wrench-tecnologias-utilizadas)
-- [:woman\_technologist: Dev](#woman_technologist-dev)
+- [:man_technologist: Dev](#woman_technologist-dev)
 
 ## :cloud_with_lightning_and_rain: Sobre o projeto
 
@@ -58,7 +58,7 @@ i -> para abrir no emulador iOS
 - External font by Google
 
 
-## :woman_technologist: Dev
+## :man_technologist: Dev
 
 Meu nome é Lucas Lima, e foi um prazer criar esse aplicativo e toda sua interface.
 Para saber mais detalhes sobre minha carreira acesse meu [LinkedIn](https://www.linkedin.com/in/lucasarl1m/) 👨‍💻.
