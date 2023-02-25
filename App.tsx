@@ -31,6 +31,7 @@ export default function App() {
                 style="light"
                 backgroundColor="transparent"
                 translucent
+                networkActivityIndicatorVisible
             />
         </NativeBaseProvider>
     );

@@ -7,7 +7,7 @@ export function Routes() {
     const theme = useTheme();
 
     return (
-        <Box flex={1} bg={theme.colors.dark[500]} px={4} safeArea>
+        <Box flex={1} bg={theme.colors.dark[500]} px={4} safeArea py={4}>
             <NavigationContainer>
                 <AppRoutes />
             </NavigationContainer>

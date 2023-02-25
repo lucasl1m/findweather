@@ -10,6 +10,7 @@ import {
     SectionList,
     Center,
     Box,
+    ScrollView,
 } from "native-base";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -291,6 +292,7 @@ export function Home() {
             ]}
             renderItem={({ item }) => item}
             keyExtractor={(_, index) => String(index)}
+            showsVerticalScrollIndicator={false}
         />
     );
 }

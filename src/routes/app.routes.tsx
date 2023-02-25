@@ -41,6 +41,7 @@ function MainTabs() {
                 tabBarInactiveTintColor: colors.gray[500],
                 tabBarStyle: {
                     display: "flex",
+                    height: Platform.OS === "ios" ? 56 : 60,
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
@@ -50,7 +51,7 @@ function MainTabs() {
                 },
                 tabBarItemStyle: {
                     position: "relative",
-                    top: Platform.OS === "android" ? -10 : 0,
+                    top: 0,
                 },
             }}
         >
