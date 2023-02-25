@@ -57,6 +57,3 @@ dist/
 
 # Env files
 .env
-
-# Github
-.github/
