@@ -39,7 +39,7 @@ Depois do clone rode:
 
 ```bash
 cd findWeather
-yarn install
+npm install
 npx expo start -c
 a -> para abrir no emulador Android
 i -> para abrir no emulador iOS
